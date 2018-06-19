@@ -10,7 +10,7 @@ procedure Tasks_1 is
     task buffer is
         entry Put (param: in Integer);
         entry Get (param: out Integer);
-    end ;
+    end;
     productId: Integer := 0;
 
     task body producer is
@@ -35,7 +35,7 @@ procedure Tasks_1 is
     end;
 
     task body buffer is
-        buf: Integer := -1; -- -1 = buffer
+        buf: Integer := -1; -- -1 = empty
     begin
         loop
             select
