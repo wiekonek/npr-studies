@@ -12,20 +12,23 @@ procedure Tasks is
 		entry Get (param: out Integer);
 	end BUF;
 	bufTask: BUF;
+	productId: Integer := 0;
 
 	task body producer is
 	begin
-		for i in 1..10 loop
-			bufTask.Put(i);
+		loop
+			delay 1.0;
+			bufTask.Put(productId);
 			Put("Producing: ");
-			Put_Line(Integer'Image(i));
+			Put_Line(Integer'Image(productId));
+			productId := productId + 1;
 		end loop;
 	end;
 
 	task body consumer is
 		product: Integer;
 	begin
-		for i in 1..10 loop
+		loop
 			bufTask.Get(product);
 			Put("Consuming: ");
 			Put_Line(Integer'Image(product));
