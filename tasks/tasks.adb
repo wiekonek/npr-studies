@@ -1,3 +1,5 @@
+-- Producent - konsument, buffor 1 el., spotkania
+
 with Ada.Text_IO;
 use Ada.Text_IO;
 
