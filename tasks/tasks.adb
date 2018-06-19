@@ -33,15 +33,19 @@ procedure Tasks is
 	end;
 
 	task body BUF is
-	       buffer: Integer;	
+		buffer: Integer := -1; -- -1 = buffer	       
 	begin
-		for i in 1..10 loop
-			accept Put(param: in Integer) do
-				buffer := param;
-			end Put;
-			accept Get(param: out Integer) do
-				param := buffer;
-			end Get;
+		loop
+			select
+				when buffer = -1 => accept Put(param: in Integer) do
+					buffer := param;
+				end Put;
+			or
+				when buffer > -1 => accept Get(param: out Integer) do
+					param := buffer;
+					buffer := -1;
+				end Get;
+			end select;
 		end loop;
 	end;
 begin
