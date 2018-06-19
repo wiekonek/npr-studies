@@ -1,24 +1,23 @@
--- Producent - konsument, buffor 1 el., spotkania
+-- Producer-consumer, buffer 1 el., tasks
 
 with Ada.Text_IO;
 use Ada.Text_IO;
 
-procedure Tasks is
+procedure Tasks_1 is
 
     task producer;
     task consumer;
-    task type BUF is
+    task buffer is
         entry Put (param: in Integer);
         entry Get (param: out Integer);
-    end BUF;
-    bufTask: BUF;
+    end ;
     productId: Integer := 0;
 
     task body producer is
     begin
         loop
             delay 1.0;
-            bufTask.Put(productId);
+            buffer.Put(productId);
             Put("Producing: ");
             Put_Line(Integer'Image(productId));
             productId := productId + 1;
@@ -29,29 +28,29 @@ procedure Tasks is
         product: Integer;
     begin
         loop
-            bufTask.Get(product);
+            buffer.Get(product);
             Put("Consuming: ");
             Put_Line(Integer'Image(product));
         end loop;
     end;
 
-    task body BUF is
-        buffer: Integer := -1; -- -1 = buffer
+    task body buffer is
+        buf: Integer := -1; -- -1 = buffer
     begin
         loop
             select
-                when buffer = -1 => accept Put(param: in Integer) do
-                    buffer := param;
+                when buf = -1 => accept Put(param: in Integer) do
+                    buf := param;
                 end Put;
             or
-                when buffer > -1 => accept Get(param: out Integer) do
-                    param := buffer;
-                    buffer := -1;
+                when buf > -1 => accept Get(param: out Integer) do
+                    param := buf;
+                    buf := -1;
                 end Get;
             end select;
         end loop;
     end;
 begin
     null;
-end Tasks;
+end Tasks_1;
 
