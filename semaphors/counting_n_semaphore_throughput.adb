@@ -1,25 +1,27 @@
 with Ada.Text_IO;
 use Ada.Text_IO;
 
-procedure Counting_N_Semaphore is
+procedure Counting_N_Semaphore_Throughput is
+
+    type Temp_Array is array(1..4) of Positive;
+
     protected Semaphore is
         entry P(n: in Positive);
         procedure V(n: in Positive);
     private
         s: Integer := 4;
-        temp_n: Positive := Positive'First;
-        entry Wait;
-
+        entry Wait(n: in Positive);
+        hold: Boolean := false;
     end Semaphore;
 
     protected body Semaphore is
 
-        entry P(n: in Positive) when Wait'count = 0 is
+        entry P(n: in Positive) when True is
         begin
             if n <= s then
                 s := s - n;
             else
-                temp_n := n;
+                hold := true;
                 requeue Wait;
             end if;
         end P;
@@ -27,11 +29,12 @@ procedure Counting_N_Semaphore is
         procedure V(n: in Positive) is
         begin
             s := s + n;
+            hold := false;
         end V;
 
-        entry Wait when temp_n <= s is
+        entry Wait(n: in Positive)  when not hold is
         begin
-            s:= s - temp_n;
+            requeue P;
         end Wait;
 
     end Semaphore;
@@ -43,11 +46,11 @@ procedure Counting_N_Semaphore is
     task body task1 is
     begin
         loop
-            Semaphore.P(1);
+            Semaphore.P(2);
             Put_Line("task1 in critical section");
             delay 0.5;
             Put_Line("task1 out of critical section");
-            Semaphore.V(1);
+            Semaphore.V(2);
         end loop;
     end task1;
 
@@ -75,5 +78,5 @@ procedure Counting_N_Semaphore is
 
 begin
     null;
-end Counting_N_Semaphore;
+end Counting_N_Semaphore_Throughput;
 
