@@ -1,27 +1,39 @@
 with Ada.Text_IO;
 use Ada.Text_IO;
 
-procedure Binary_Semaphore is
-
+procedure Counting_N_Semaphore is
     protected Semaphore is
-        entry P;
-        entry V;
+        entry P(n: in Positive);
+        procedure V(n: in Positive);
     private
-        taken: Boolean := False;
-    end Semaphore;
+        s: Integer := 4;
+        temp_n: Positive := Positive'First;
+        entry Wait;
 
+    end Semaphore;
 
     protected body Semaphore is
 
-        entry P when taken = False is
+        entry P(n: in Positive) when Wait'count = 0 is
         begin
-            taken := True;
+            if n <= s then
+                s := s - n;
+            else
+                temp_n := n;
+                requeue Wait;
+            end if;
         end P;
 
-        entry V when taken = True is
+        procedure V(n: in Positive) is
         begin
-           taken := False;
+            s := s + n;
         end V;
+
+        entry Wait when temp_n <= s is
+        begin
+            s:= s - temp_n;
+        end Wait;
+
     end Semaphore;
 
     task task1;
@@ -31,35 +43,37 @@ procedure Binary_Semaphore is
     task body task1 is
     begin
         loop
-            Semaphore.P;
+            Semaphore.P(1);
             Put_Line("task1 in critical section");
             delay 0.5;
             Put_Line("task1 out of critical section");
-            Semaphore.V;
+            Semaphore.V(1);
         end loop;
     end task1;
 
     task body task2 is
     begin
         loop
-            Semaphore.P;
+            Semaphore.P(3);
             Put_Line("task2 in critical section");
             delay 1.0;
             Put_Line("task2 out of critical section");
-            Semaphore.V;
+            Semaphore.V(3);
         end loop;
     end task2;
 
     task body task3 is
     begin
         loop
-            Semaphore.P;
+            Semaphore.P(2);
             Put_Line("task3 in critical section");
             delay 2.0;
             Put_Line("task3 out of critical section");
-            Semaphore.V;
+            Semaphore.V(2);
         end loop;
     end task3;
+
 begin
     null;
-end Binary_Semaphore;
+end Counting_N_Semaphore;
+

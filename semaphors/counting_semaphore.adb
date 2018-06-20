@@ -1,27 +1,26 @@
 with Ada.Text_IO;
 use Ada.Text_IO;
 
-procedure Binary_Semaphore is
-
+procedure Counting_Semaphore is
     protected Semaphore is
         entry P;
-        entry V;
+        procedure V;
     private
-        taken: Boolean := False;
+        s: Integer := 2;
     end Semaphore;
-
 
     protected body Semaphore is
 
-        entry P when taken = False is
+        entry P when s > 0 is
         begin
-            taken := True;
+            s := s - 1;
         end P;
 
-        entry V when taken = True is
+        procedure V is
         begin
-           taken := False;
+            s := s + 1;
         end V;
+
     end Semaphore;
 
     task task1;
@@ -60,6 +59,7 @@ procedure Binary_Semaphore is
             Semaphore.V;
         end loop;
     end task3;
+
 begin
     null;
-end Binary_Semaphore;
+end Counting_Semaphore;
