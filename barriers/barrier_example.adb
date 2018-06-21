@@ -3,7 +3,7 @@ use Ada.Text_IO;
 
 procedure Barrier_Example is
 
-    N: constant Integer := 2;
+    N: constant Integer := 3;
 
     protected Barrier is
         entry Await;
@@ -28,26 +28,23 @@ procedure Barrier_Example is
 
     end Barrier;
 
-    task task1;
-    task task2;
+    task type T(id: Integer) is
+    end T;
 
-    task body task1 is
+    task body T is
     begin
-        Put_Line("1 started");
-        delay 1.0;
-        Put_Line("1 waiting");
+        Put_Line(Integer'Image(id) & " started");
+        delay id * 0.5;
+        Put_Line(Integer'Image(id) & " waiting");
         Barrier.Await;
-        Put_Line("1 ended");
-    end task1;
+        Put_Line(Integer'Image(id) & " ended");
+    end T;
 
-    task body task2 is
-    begin
-        Put_Line("2 started");
-        delay 0.5;
-        Put_Line("2 waiting");
-        Barrier.Await;
-        Put_Line("2 ended");
-    end task2;
+
+    task1: T(1);
+    task2: T(2);
+    task3: T(3);
+
 
 begin
     null;
